@@ -1,19 +1,22 @@
 import random as r
+import math as m
+#import matplotlib.pyplot as plt
 
 # Declaring variables for the knapsack problem
-capacity = 10
-numOfItems = 5
+numOfItems = 8
 minWeight = 1
 maxWeight = 6
 minValue = 1
 maxValue = 10
+capacity = 11
 
 # Declaring variables for the genetic algorithm
-populationSize = 10
+populationSize = 20
 population = []
 crossoverRate = 0.9
 mutationRate = 0.1
-generations = 100
+generations = 10
+averageFitnessOfGenerations = []
 
 # Create the items that can be put in the knapsack
 weight = [0] * numOfItems
@@ -22,6 +25,7 @@ for i in range(numOfItems):
     weight[i] = r.randint(minWeight, maxWeight)
     value[i] = r.randint(minValue, maxValue)
     
+print("The maximum weight of the knapsack is: " + str(capacity))
 print("The weight of the items is: ", weight)
 print("The value of the items is: ", value)
 
@@ -35,7 +39,7 @@ def createCandidate():
 for i in range(populationSize):
     population.append(createCandidate())
     
-print("The initial population is: ", population)
+#print("The initial population is: ", population)
 
 # Find the fitness of each candidate and sort the population based on the fitness
 '''
@@ -57,9 +61,17 @@ def fitness(candidate):
     else:
         return totalValue
     
-population.sort(key = lambda x: fitness(x))
+def findAverageFitness():
+    totalFitness = 0
+    for i in range(populationSize):
+        totalFitness += fitness(population[i])
+    avg = totalFitness / populationSize
+    averageFitnessOfGenerations.append(avg)
+    return str(avg)
+    
+#population.sort(key = lambda x: fitness(x))
 
-print("The sorted population is: ", population)
+#print("The sorted population is: ", population)
 
 # Create the next generation
 '''
@@ -85,16 +97,85 @@ def mutate(candidate):
         newCandidate = candidate[:mutatedIndex] + '1' + candidate[mutatedIndex + 1:]
     return newCandidate
 
-def tournamentSelection(candidates):
-    while len(candidates) > 1:
-        for i in range(len(candidates) / 2):
-            print("here" + str(i))
-            if candidates[i] < candidates[i + 1]:
-                candidates.pop(i)
-            else:
-                candidates.pop(i + 1)
-    return candidates[0]
-                
-candidates = population[:10]
-print(candidates)
-print(tournamentSelection(candidates))
+'''
+The tournamentSelection will take a random sample of the population as a
+parameter and return the candidate with the highest fitness. This function
+will be ran multiple times to create the next generation.
+'''
+def tournamentSelection():
+    r.shuffle(population)
+    candidates = population[:m.floor(populationSize * .1)]
+    winner = candidates[0]
+    for i in range(1, len(candidates)):
+        if fitness(candidates[i]) > fitness(winner):
+            winner = candidates[i]
+    return winner
+
+'''
+The createNewCandidate function will create a new candidate based on the
+crossover and mutation rates. If the crossover rate is met, the function will
+create a new candidate by crossing over two parents. If the mutation rate is
+met, the function will mutate the new candidate. If neither rate is met, the
+function will create a new candidate by selecting a random candidate from the
+population.
+'''
+def createNewChild():
+    doCrossover = False
+    doMutate = False
+    if r.random() < crossoverRate:
+        crossover = True
+    if r.random() < mutationRate:
+        mutate = True
+    if doCrossover:
+        parent1 = tournamentSelection()
+        parent2 = tournamentSelection()
+        child = crossover(parent1, parent2)
+        if doMutate:
+            return mutate(child)
+        else:
+            return child
+    else:
+        child = tournamentSelection()
+        if doMutate:
+            return mutate(child)
+        else:
+            return child
+        
+# Create the next generation
+'''
+The createNewGeneration function will create a new generation of candidates
+based on the createNewChild function.
+'''
+def createNewGeneration():
+    global population
+    newPopulation = []
+    for i in range(populationSize):
+        newPopulation.append(createNewChild())
+    population = newPopulation
+
+# Print the generations stats
+def displayGeneration(currentGeneration):
+    print("---Generation " + str(currentGeneration) + "---")
+    population.sort(key = lambda x : fitness(x), reverse=True)
+    print("Top ten candidates: ", population[:10])
+    print("The fitness of the best candidate is: ", fitness(population[0]))
+    print("The average fitness of this generation is: " + findAverageFitness())
+
+# Main loop
+for i in range(generations - 1):
+    displayGeneration(i + 1)
+    createNewGeneration()
+displayGeneration(generations)
+
+# Print the best candidate
+population.sort(key = lambda x : fitness(x), reverse=True)
+print("The optimal solution is: ", population[0])
+
+# Plot the average fitness of each generation
+'''
+plt.plot(averageFitnessOfGenerations)
+plt.xlabel('Generation')
+plt.ylabel('Average Fitness')
+plt.title('Average Fitness of Each Generation')
+plt.show()
+'''
