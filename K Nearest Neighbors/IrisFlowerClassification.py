@@ -1,7 +1,4 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import sklearn as sk
 from sklearn import datasets
 from sklearn import model_selection
 from collections import Counter
@@ -10,7 +7,7 @@ iris = datasets.load_iris()
 X = iris.data
 Y = iris.target
 
-X_train, X_test, Y_train, Y_test = sk.model_selection.train_test_split(X, Y, test_size=0.2, random_state=1234)
+X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X, Y, test_size=0.2, random_state=1234)
 
 class KNN():
     def __init__(self, k=3):
