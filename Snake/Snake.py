@@ -45,6 +45,9 @@ class Snake():
         newHeadPosition = ((currentX + directionX * BLOCK_SIZE), (currentY + directionY * BLOCK_SIZE))
         self.points.insert(0, newHeadPosition)
         self.points.pop()
+        if self.getHeadPosition()[0] < 0 or self.getHeadPosition()[0] >= SCREEN_WIDTH or self.getHeadPosition()[1] < 0 or self.getHeadPosition()[1] >= SCREEN_HEIGHT or self.getHeadPosition() in self.points[1:]:
+            self.alive = False
+
         
     def draw(self, surface):
         for p in self.points:
