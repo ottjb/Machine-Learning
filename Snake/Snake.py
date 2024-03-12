@@ -41,7 +41,7 @@ class Snake():
         newHeadPosition = ((currentX + directionX * BLOCK_SIZE), (currentY + directionY * BLOCK_SIZE))
         self.points.insert(0, newHeadPosition)
         self.points.pop()
-        
+
     def draw(self, surface):
         for p in self.points:
             r = pg.Rect((p[0], p[1]), (BLOCK_SIZE, BLOCK_SIZE))
