@@ -1,6 +1,6 @@
 import random as r
 import math as m
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Declaring variables for the knapsack problem
 numOfItems = 8
@@ -172,10 +172,11 @@ population.sort(key = lambda x : fitness(x), reverse=True)
 print("The optimal solution is: ", population[0])
 
 # Plot the average fitness of each generation
-'''
 plt.plot(averageFitnessOfGenerations)
 plt.xlabel('Generation')
+plt.xticks(range(0, generations))
 plt.ylabel('Average Fitness')
+plt.yticks(range(0, maxValue * numOfItems, 10))
 plt.title('Average Fitness of Each Generation')
 plt.show()
-'''
+print(len(averageFitnessOfGenerations))
